@@ -6,13 +6,15 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <stdlib.h>
 
 using namespace std;
 
 
 
 //list<string> internes_command = { "cd","exit","echo","myjobs","myhistory" };
-string internes_command[5] = {"cd","exit","echo","myjobs","myhistory"};
+//enum INTERNAL_COMMANDS {cd,exit,echo,myjobs,myhistory};
+string internes_command[5] = { "cd","exit","echo","myjobs","myhistory" };
 
 
 
@@ -47,12 +49,19 @@ vector<string> get_dirs(string env_var) {   // i have done a second fucntion for
 	}
 	return result;
 }
+
+
+bool is_complete_path(string& path)
+{
+    return path.find('/')!=string::npos;
+}
 string command_exists_in_single_path(string path, string command)
 {
 	DIR* dp = opendir(path.c_str());
 	if (dp == nullptr)
 	{
-		perror("cannot open dir ");return ""; // or exit() to end all the programme 
+		
+        return "-1"; // or exit() to end all the programme 
 	}
 	struct dirent* entry;
 	
@@ -75,7 +84,8 @@ string search_command_in_PATH(vector<string>& dirs, string command)
 	for (vector<string>::iterator it=dirs.begin();it!= dirs.end();++it)
     {
         search_result=command_exists_in_single_path(*it,command);
-        if   (search_result !="")
+        
+        if   (search_result !="" && search_result!="-1")
                return search_result;
     }
         
@@ -106,25 +116,54 @@ int main() {
         if (cmd=="") continue;
 		vector<string> splitted_command = split(cmd);
 		cout << "result[0]= " << splitted_command[0]<<endl;
+
+
 		bool interne_cmd = in_or_out_command(splitted_command[0]);
+
+        //---------------INTERNE COMAND FIRST
+        if (interne_cmd)
+
+        {
+            cout << "--------------Interne Command-------------" << endl;
+            if (splitted_command[0] == "cd") {
+                chdir(splitted_command[1].c_str());
+            }
+            else if (splitted_command[0] == "exit") {
+                exit(0);
+            }
+            else if (splitted_command[0] == "echo") cout<<splitted_command[1]<<endl;
+            else cout << "no such interne comand found"<<endl;
+            
+
+            continue;
+            
+
+
+        }
+
 
 
 		//first off all i have to find the comamnd in the PATH repertories
 		const char* path = getenv("PATH");
 		//// searhc if var exist ( if command without path)
         vector<string> dirs=get_dirs(path);
-        string my_command_entire_path=search_command_in_PATH(dirs,splitted_command[0]);
-        if (my_command_entire_path=="")
-        {    perror("no such command");
-             continue;
+        string my_command_entire_path="";
+        if (is_complete_path(splitted_command[0]))
+            my_command_entire_path=splitted_command[0];
+        else
+        {
+            my_command_entire_path=search_command_in_PATH(dirs,splitted_command[0]);
+            if (my_command_entire_path=="")
+            {    perror("no such command");
+                continue;
+            }
+            else  {}
         }
-        else  {
+            
 
-        }
-		if (interne_cmd)
-			cout << "--------------Interne Command-------------" << endl;
+			
 
-		else
+		//------------------ continue to externe command
         {
             cout << "-----------------External Command---------------" << endl;
             pid_t child=fork();
@@ -144,10 +183,17 @@ int main() {
             else
                 perror(" fork failed");
         }
-	}while (cmd != "exit");
+	}while (true);
 		
 
 
 
 
 }
+
+
+//arrete ici 
+//>>echo "jhv"
+//result[0]= echo
+//--------------Interne Command-------------
+//"jhv"
