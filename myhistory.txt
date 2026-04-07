@@ -1,0 +1,89 @@
+ls
+/bin/ls
+zf/cf
+azf
+.azf
+echo ezf
+echo zefv ezf aazf
+sleep 20 &
+sleep 40 &
+myjobs
+myhistory
+exit
+echo ezg
+sleep 5 &
+myhistory
+myjobs
+[A
+exit
+zhbg
+echo egz
+sleep 50 &
+sleep 5 &
+myjobs
+myhistory
+myjobs
+exit
+echo erg
+cd build
+cd
+pwd
+sleep 50 &
+myjobs
+exit
+echo g
+echo "bhh"
+echo $HOME
+echo $PATH
+exit
+ls -a
+echo ge
+echo $HOME
+echo $PATH
+exit
+echo zeg
+echo $HOME
+[A[A[A[A
+echo $PATH
+exit
+ls
+/bin/echo eg
+bin/echo 
+cd [3~[3~
+cd [3~[3~
+cd ..
+pwd
+ cd build-shell
+cd 
+pwd
+sleep 50 &
+sleep 10 &
+sleep 2 &
+myjobs
+[A
+myjobs
+mkdir -p test
+ls
+myhistory
+cd build
+pwd
+cd build-shell
+myhistory
+exit
+zrg
+eecho zef
+echo $HOME
+exit
+echo vrg
+echo $HOME
+ls -lsa
+/bin/ls 
+cd build
+cd 
+pwd
+myhistory
+pwd
+cd build-shell
+pwd
+myhistory
+exit

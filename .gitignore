@@ -1,6 +1,8 @@
 
 # Build artifacts
-build/
+my_shell
+shell
+history.txt
 *.o
 *.exe
 *.out
@@ -13,4 +15,4 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
-my_shell
+
