@@ -1,6 +1,7 @@
 
 # Build artifacts
 my_shell
+shell
 history.txt
 *.o
 *.exe
