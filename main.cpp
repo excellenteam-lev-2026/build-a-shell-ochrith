@@ -169,13 +169,13 @@ int main() {
         {
             
             if (splitted_command[0] == "cd") {
-                if (splitted_command.size()<2)
+                if (splitted_command.size()<2 or (splitted_command.size() >1 && splitted_command[1]=="~"))
                     {  
-                        chdir(home);
+                        chdir(home);   //default value
                         continue;
                     }
 
-                if (chdir(splitted_command[1].c_str())!=0) 
+                else if (chdir(splitted_command[1].c_str())!=0) 
                     cout<<" Failed to change directory, check if "<<splitted_command[1]<<" exists !"<<endl;
             }
             else if (splitted_command[0] == "exit") {
