@@ -184,7 +184,7 @@ int main() {
             else if (splitted_command[0] == "echo") {
                 if (splitted_command.size() >1){
                     //const char** msg=(char* const*)splitted_command[1];
-                    if (splitted_command[1][0]=='$')
+                    if (splitted_command[1][0]=='$')                 //bonus
                         cout<<getenv(splitted_command[1].substr(1).c_str())<<endl;
                     else {
                             for (size_t t=1;t<splitted_command.size();++t) cout<<splitted_command[t]<<" ";
