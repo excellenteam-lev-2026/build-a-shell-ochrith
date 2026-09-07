@@ -1,7 +1,5 @@
 //Exercise Build a Shell
 //Ochrith PEREZ 209727361
-
-
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/wait.h>
@@ -12,7 +10,7 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <fstream>
-
+#include <fcntl.h>
 
 using namespace std;
 
@@ -82,6 +80,7 @@ bool is_complete_path(string& path)
 {
     return path.find('/')!=string::npos;
 }
+
 string command_exists_in_single_path(string path, string command)
 {
 	DIR* dp = opendir(path.c_str());
@@ -131,7 +130,53 @@ const char** fromVectorToArray(const vector<string>& vec)
     return args;
 }
 
- 
+
+void clean_command_forredirection(
+    vector<string>& splitted_command,
+    string& input_redirection,
+    string& output_redirection,
+    bool& trunc)
+{
+    for (size_t i = 0; i < splitted_command.size(); ++i) {
+
+        if (splitted_command[i] == "<") {
+
+            if (i + 1 >= splitted_command.size())
+                continue;
+
+            input_redirection = splitted_command[i + 1];
+
+            splitted_command.erase(
+                splitted_command.begin() + i,
+                splitted_command.begin() + i + 2
+            );
+
+            --i;
+        }
+
+        else if (splitted_command[i] == ">" ||
+                 splitted_command[i] == ">>") {
+
+            if (i + 1 >= splitted_command.size())
+                continue;
+
+            string operator_redirection = splitted_command[i];
+
+            output_redirection = splitted_command[i + 1];
+
+            trunc = (operator_redirection == ">");
+
+            splitted_command.erase(
+                splitted_command.begin() + i,
+                splitted_command.begin() + i + 2
+            );
+
+            --i;
+        }
+    }
+}
+
+
 int main() {
 		
     const char* home= getenv("HOME");    //for history file - i choose to put the file here to open from every directory 
@@ -144,6 +189,7 @@ int main() {
 	do {
         background=false;   // for background processes
         checkJobs();
+        
 		cout << ">>";
         getline(cin,cmd);   //read until tape ENTER ,better than cin>>cmd 
    
@@ -157,9 +203,19 @@ int main() {
         }
        
 		vector<string> splitted_command = split(cmd);
-    
+        string input_redirection = "";
+        string output_redirection = "";
+        bool trunc = false;
 
+        clean_command_forredirection(splitted_command,
+                                     input_redirection,
+                                     output_redirection,
+                                     trunc);
 
+        
+        
+        
+      
 		bool interne_cmd = in_or_out_command(splitted_command[0]);
 
         //---------------INTERNE COMAND FIRST-----------------------------------------
@@ -167,11 +223,13 @@ int main() {
         if (interne_cmd)
 
         {
+
+
             
             if (splitted_command[0] == "cd") {
                 if (splitted_command.size()<2 or (splitted_command.size() >1 && splitted_command[1]=="~"))
                     {  
-                        chdir(home);   //default value
+                        chdir(home);   //default value  --
                         continue;
                     }
 
@@ -183,6 +241,9 @@ int main() {
             }
             else if (splitted_command[0] == "echo") {
                 if (splitted_command.size() >1){
+
+                    
+                    
                     //const char** msg=(char* const*)splitted_command[1];
                     if (splitted_command[1][0]=='$')                 //bonus
                         cout<<getenv(splitted_command[1].substr(1).c_str())<<endl;
@@ -245,6 +306,25 @@ int main() {
         pid_t child=fork();
         if (child==0)   // i am the child
                 {
+                    if (!input_redirection.empty()) {
+                    int fd = open(input_redirection.c_str(), O_RDONLY);
+                    if (fd == -1) {
+                        cerr << "Failed to open input file: " << input_redirection << endl;
+                        continue;
+                    }
+                    dup2(fd, STDIN_FILENO);
+                    close(fd);
+                }
+                if (!output_redirection.empty()) {
+                    int flags = O_WRONLY | O_CREAT | (trunc ? O_TRUNC : O_APPEND);
+                    int fd = open(output_redirection.c_str(), flags, 0644);
+                    if (fd == -1) {
+                        cerr << "Failed to open output file: " << output_redirection << endl;
+                        continue;
+                    }
+                    dup2(fd, STDOUT_FILENO);
+                    close(fd);
+                }
 
                      const char** args=fromVectorToArray(splitted_command);
                      
